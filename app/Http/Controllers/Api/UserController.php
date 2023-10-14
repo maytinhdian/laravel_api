@@ -12,15 +12,15 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $where = [];
-        if ($request->name) {   
-            $where[]=['name','like','%'.$request->name.'%'];
+        if ($request->name) {
+            $where[] = ['name', 'like', '%' . $request->name . '%'];
         }
-        if ($request->email) {   
-            $where[]=['email','like','%'.$request->email.'%'];
+        if ($request->email) {
+            $where[] = ['email', 'like', '%' . $request->email . '%'];
         }
-        $user = User::orderBy('id','desc');
+        $user = User::orderBy('id', 'desc');
         if (!empty($where)) {
-           $user=$user->where($where);
+            $user = $user->where($where);
         }
         $user = $user->get();
         if ($user->count()) {
@@ -37,18 +37,89 @@ class UserController extends Controller
     public function detail(User $user)
     {
         if (!$user) {
-            $status='no_data';
-        }else {
-            $status='success';
+            $status = 'no_data';
+        } else {
+            $status = 'success';
         }
         $response = [
-            'status' =>$status,
+            'status' => $status,
             'data' => $user,
         ];
         return $response;
     }
     public function create(Request $request)
     {
+        
+        $this->validation($request);
+
+        $user = new User();
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+
+        $user->save();
+
+        if ($user->id) {
+
+            $response = [
+                'status' => 'success',
+                'data' => $user,
+            ];
+        } else {
+            $response = [
+                'status' => 'error',
+                'data' => $user,
+            ];
+        }
+    }
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            $response = [
+                'status' => 'no_data',
+            ];
+        } else {
+
+            $this->validation($request,$id);
+
+            $method = $request->method();
+
+            if ($method == 'PUT') {
+                $user->name = $request->name;
+                $user->email = $request->email;
+                if ($request->password) {
+                    $user->password = Hash::make($request->password);
+                } else {
+                    $user->password = null;
+                }
+                $user->save();
+            } else {
+                if ($request->name) {
+                    $user->name = $request->name;
+                }
+                if ($request->email) {
+                    $user->email = $request->email;
+                }
+                if ($request->password) {
+                    $user->password = Hash::make($request->password);
+                }
+                $user->save();
+            }
+            $response = [
+                'status' => 'success',
+                'data' => $user
+            ];
+           
+        }
+        return $response;
+    }
+    public function delete(User $user)
+    {
+        return $user;
+    }
+    public function validation(Request $request,$id=0){
         $rules = [
             'name' => 'required|min:5',
             'email' => 'required|email|unique:users',
@@ -66,34 +137,7 @@ class UserController extends Controller
         ];
         $request->validate($rules, $message);
 
-        $user = new User();
-
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-
-        $user->save();
-
-        if ($user->id) {
-
-            $respone = [
-                'status' => 'success',
-                'data' => $user,
-            ];
-        } else {
-            $respone = [
-                'status' => 'error',
-                'data' => $user,
-            ];
-        }
     }
-    public function update(Request $request, User $user)
-    {
-        echo $request->method();
-        return $request->all();
-    }
-    public function delete(User $user)
-    {
-        return $user;
-    }
+    
+
 }
