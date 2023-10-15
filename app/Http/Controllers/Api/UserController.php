@@ -27,7 +27,7 @@ class UserController extends Controller
 
         
 
-        $user = $user->with('posts') ->paginate();
+        $user = $user->paginate();
 
         if ($user->count()) {
             $statusCode = '200';
