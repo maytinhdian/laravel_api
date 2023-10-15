@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +27,4 @@ Route::prefix('users')->name('users.')->group(function(){
     Route::patch('/{user}', [UserController::class,'update'])->name('update-patch');
     Route::delete('/{user}', [UserController::class,'delete'])->name('delete');
 });
+Route::apiResource('products',ProductController::class);
