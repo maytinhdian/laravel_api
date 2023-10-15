@@ -30,3 +30,4 @@ Route::prefix('users')->name('users.')->middleware('auth:sanctum')->group(functi
 });
 Route::apiResource('products',ProductController::class);
 Route::post('login',[AuthController::class,'login']);
+Route::get('token',[AuthController::class,'getToken'])->middleware('auth:sanctum');

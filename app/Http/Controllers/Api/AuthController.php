@@ -21,7 +21,7 @@ class AuthController extends Controller
 
         if ($checkLogin) {
             $user = Auth::user();
-            $token = $user -> createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('auth_token')->plainTextToken;
             $reponse = [
                 'status' => 200,
                 'token' => $token,
@@ -33,5 +33,17 @@ class AuthController extends Controller
                 'title' => 'Unauthorized'
             ];
         }
+    }
+
+    public function getToken(Request $request)
+    {
+        $user = User::find(1);
+        // foreach ($user->tokens as $token) {
+        //     echo '</br>';
+        //     echo $token->token;
+        // }
+        // $user->tokens()->where('id',10)->delete();
+        // dd($user->currentAccessToken());
+        return $request->user()->currentAccessToken()->delete();
     }
 }
