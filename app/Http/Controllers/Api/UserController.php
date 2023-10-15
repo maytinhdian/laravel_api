@@ -30,14 +30,16 @@ class UserController extends Controller
         $user = $user->with('posts') ->paginate();
 
         if ($user->count()) {
-            $status = 'success';
+            $statusCode = '200';
+            $statusText = 'success';
         } else {
-            $status = 'no_data';
+            $statusCode = '204';
+            $statusText = 'no_data';
         }
 
       
 
-        $users = new UserCollection($user,$status);
+        $users = new UserCollection($user,$statusCode,$statusText);
 
         // $users=UserResource::collection($user);
         // $response = [
@@ -50,15 +52,19 @@ class UserController extends Controller
     {
         $user = User::with('posts')->find($id);
         if (!$user) {
-            $status = 'no_data';
+            $statusCode = '404';
+            $statusText = 'no_data';
         } else {
-            $status = 'success';
+            $statusCode = '200';
+            $statusText = 'success';
+            $user = new UserResource($user);
         }
 
-        $user = new UserResource($user);
+       
 
         $response = [
-            'status' => $status,
+            'status' => $statusCode,
+            'title' => $statusText,
             'data' => $user,
         ];
         return $response;
@@ -79,13 +85,14 @@ class UserController extends Controller
         if ($user->id) {
 
             $response = [
-                'status' => 'success',
+                'status' => 201,
+                'title'=>'create',
                 'data' => $user,
             ];
         } else {
             $response = [
-                'status' => 'error',
-                'data' => $user,
+                'status' => 500,
+                'title'=> 'server error',
             ];
         }
     }
