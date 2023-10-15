@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\UserResource;
 
 class UserController extends Controller
 {
@@ -28,9 +29,10 @@ class UserController extends Controller
         } else {
             $status = 'no_data';
         }
+        $users=UserResource::collection($user);
         $response = [
             'status' => $status,
-            'data' => $user,
+            'data' => $users,
         ];
         return $response;
     }
@@ -41,6 +43,9 @@ class UserController extends Controller
         } else {
             $status = 'success';
         }
+
+        $user = new UserResource($user);
+
         $response = [
             'status' => $status,
             'data' => $user,
