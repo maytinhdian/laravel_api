@@ -27,8 +27,8 @@ class UserController extends Controller
 
         
 
-        $user = $user->paginate();
-        
+        $user = $user->with('posts') ->paginate();
+
         if ($user->count()) {
             $status = 'success';
         } else {
@@ -46,8 +46,9 @@ class UserController extends Controller
         // ];
         return $users;
     }
-    public function detail(User $user)
+    public function detail($id)
     {
+        $user = User::with('posts')->find($id);
         if (!$user) {
             $status = 'no_data';
         } else {

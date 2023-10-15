@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use App\Http\Resources\UserResource;
 
+use App\Http\Resources\PostResource;
+
 class UserCollection extends ResourceCollection
 {
 
@@ -27,6 +29,7 @@ class UserCollection extends ResourceCollection
             'data'=>$this->collection,
             'status'=> $this->statusText,
             'count'=>$this->collection->count(),
+            
         ];
     }
 }
