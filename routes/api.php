@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\ProductController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::prefix('users')->name('users.')->middleware('auth:sanctum')->group(function(){
+Route::prefix('users')->name('users.')->middleware('auth:api')->group(function(){
     Route::get('/',[UserController::class,'index'])->name('index');
     Route::get('/{user}',[UserController::class,'detail'])->name('detail');
     Route::post('/',[UserController::class,'create'])->name('create');
@@ -32,6 +32,8 @@ Route::prefix('users')->name('users.')->middleware('auth:sanctum')->group(functi
 });
 Route::apiResource('products',ProductController::class);
 Route::post('login',[AuthController::class,'login']);
+Route::post('logout',[AuthController::class,'logout'])->middleware('auth:api');
+
 Route::get('token',[AuthController::class,'getToken'])->middleware('auth:sanctum');
 Route::post('refresh-token',[AuthController::class,'refreshToken']);
 
