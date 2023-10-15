@@ -1,10 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\AuthController;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +34,27 @@ Route::apiResource('products',ProductController::class);
 Route::post('login',[AuthController::class,'login']);
 Route::get('token',[AuthController::class,'getToken'])->middleware('auth:sanctum');
 Route::post('refresh-token',[AuthController::class,'refreshToken']);
+
+Route::get('passport-token',function(){
+    $user=User::find(1);
+    $tokenResult = $user->createToken('auth_api');
+
+    //Thiết lập expires 
+    $token = $tokenResult->token ; 
+    $token -> expires_at = Carbon::now()->addMinutes(60);
+
+
+    //Trả về access token 
+
+    $accessToken = $tokenResult->accessToken ;
+    // return $accessToken;
+
+    //Trả về expires 
+    $expires = Carbon::parse($token -> expires_at)->toDayDateTimeString();
+
+    $reponse =[
+        'access_token'=> $accessToken,
+        'expires'=>$expires
+    ];
+    return $reponse;
+});
