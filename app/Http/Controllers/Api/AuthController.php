@@ -100,42 +100,60 @@ class AuthController extends Controller
     public function refreshToken(Request $request)
     {
 
-        if ($request->header('authorization')) {
-            $hashToken = $request->header('authorization');
-            $hashToken = trim(str_replace('Bearer', '', $hashToken));
+        // if ($request->header('authorization')) {
+        //     $hashToken = $request->header('authorization');
+        //     $hashToken = trim(str_replace('Bearer', '', $hashToken));
 
-            $token = PersonalAccessToken::findToken($hashToken);
+        //     $token = PersonalAccessToken::findToken($hashToken);
 
-            if ($token) {
+        //     if ($token) {
 
-                $tokenCreated = $token->created_at;
-                $expire = Carbon::parse($tokenCreated)->addMinutes(config('sanctum.expiration'));
+        //         $tokenCreated = $token->created_at;
+        //         $expire = Carbon::parse($tokenCreated)->addMinutes(config('sanctum.expiration'));
 
-                if (Carbon::now() >= $expire) {
-                    $userId = $token->tokenable_id;
+        //         if (Carbon::now() >= $expire) {
+        //             $userId = $token->tokenable_id;
 
-                    $user = User::find($userId);
-                    $user->tokens()->delete();
+        //             $user = User::find($userId);
+        //             $user->tokens()->delete();
 
-                    $newToken = $user->createToken('auth_token')->plainTextToken;
+        //             $newToken = $user->createToken('auth_token')->plainTextToken;
 
-                    $reponse = [
-                        'status' => 200,
-                        'token' => $newToken,
-                    ];
-                } else {
-                    $reponse = [
-                        'status' => 200,
-                        'title' => 'Unexpired',
-                    ];
-                }
-            } else {
-                $reponse = [
-                    'status' => 401,
-                    'title' => 'Unauthorized',
-                ];
-            }
+        //             $reponse = [
+        //                 'status' => 200,
+        //                 'token' => $newToken,
+        //             ];
+        //         } else {
+        //             $reponse = [
+        //                 'status' => 200,
+        //                 'title' => 'Unexpired',
+        //             ];
+        //         }
+        //     } else {
+        //         $reponse = [
+        //             'status' => 401,
+        //             'title' => 'Unauthorized',
+        //         ];
+        //     }
+        //     return $reponse;
+        // }
+
+        $client = Client::where('password_client',1)->first();
+        if ($client) {
+            $clientSecret = $client->secret;
+            $clientId = $client->id;
+            $refreshToken = $request->refresh;
+
+            $reponse =Http::asForm()->post('http://127.0.0.1:8001/oauth/token',[
+                'grant_type'=>'refresh_token',
+                'refresh_token'=>$refreshToken,
+                'client_id'=>$clientId,
+                'client_secret'=>$clientSecret,
+                'scope'=>'',
+            ]);
+
             return $reponse;
         }
+
     }
 }
